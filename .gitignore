@@ -11,6 +11,7 @@ Dockerfile
 .postgres-db
 post_cmd.txt
 pre_cmd.txt
+.idea
 
 # AWS User-specific
 .idea/**/aws.xml
