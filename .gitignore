@@ -12,6 +12,7 @@ Dockerfile
 post_cmd.txt
 pre_cmd.txt
 .idea
+tmp
 
 # AWS User-specific
 .idea/**/aws.xml
