@@ -20,4 +20,11 @@ func Setup(app *fiber.App) {
 	adminAuthenticated.Post("logout", controllers.Logout)
 	adminAuthenticated.Put("user/info", controllers.UpdateInfo)
 	adminAuthenticated.Put("user/password", controllers.UpdatePassword)
+
+	//only admin that can post
+	adminAuthenticated.Post("blog/create", controllers.CreatePost)
+
+	//Blog public API
+	var blog = api.Group("blog")
+	blog.Get("post", controllers.GetPost)
 }

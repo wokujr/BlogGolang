@@ -3,6 +3,7 @@ package database
 import (
 	"ReactGo/src/models"
 	"fmt"
+	"github.com/gofiber/fiber/v2/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -29,8 +30,8 @@ func Connect() {
 }
 
 func AutoMigration() {
-	err := DB.AutoMigrate(models.User{})
+	err := DB.AutoMigrate(&models.User{}, &models.Blog{})
 	if err != nil {
-		panic(err)
+		log.Fatal("Migration Error: ", err)
 	}
 }
