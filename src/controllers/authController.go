@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"ReactGo/src/database"
+	"ReactGo/src/middlewares"
 	"ReactGo/src/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -91,20 +92,9 @@ func Login(c *fiber.Ctx) error {
 
 // User Cookie authentication
 func User(c *fiber.Ctx) error {
-	cookie := c.Cookies("jwt")
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid {
-		c.Status(401)
-		return c.JSON(fiber.Map{
-			"message": "Unauthorized",
-			"status":  401,
-		})
-	}
-	payload := token.Claims.(*jwt.StandardClaims)
+	id, _ := middlewares.GetUserId(c)
 	var user models.User
-	database.DB.Where("id = ?", payload.Subject).First(&user)
+	database.DB.Where("id = ?", id).First(&user)
 	return c.JSON(user)
 }
 
@@ -121,6 +111,53 @@ func Logout(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "Success",
+		"status":  200,
+	})
+}
+
+func UpdateInfo(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	id, _ := middlewares.GetUserId(c)
+	user := models.User{
+		Id:        id,
+		FirstName: data["first_name"],
+		LastName:  data["last_name"],
+		Email:     data["email"],
+	}
+
+	database.DB.Model(&user).Updates(&user)
+
+	return c.JSON(user)
+}
+
+func UpdatePassword(c *fiber.Ctx) error {
+	var data map[string]string
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+	if data["password"] != data["password_confirmation"] {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "Password does not match",
+			"code":    400,
+		})
+	}
+
+	id, _ := middlewares.GetUserId(c)
+	user := models.User{
+		Id: id,
+	}
+
+	user.SetPassword(data["password"])
+	database.DB.Model(&user).Updates(&user)
+	return c.JSON(fiber.Map{
+		"message": "Password Successfully changed",
+		"user":    user,
 		"status":  200,
 	})
 }
