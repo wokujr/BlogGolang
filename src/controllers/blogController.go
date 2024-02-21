@@ -34,6 +34,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 }
 
+// Posts, get all blog post with 5 max per page
 func Posts(c *fiber.Ctx) error {
 	var limit = 5
 	page, _ := strconv.Atoi(c.Query("page", "1"))
@@ -73,6 +74,7 @@ func Posts(c *fiber.Ctx) error {
 	})
 }
 
+// GetPost get a single blog post
 func GetPost(c *fiber.Ctx) error {
 	var post models.Blog
 
@@ -104,5 +106,48 @@ func GetPost(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"data":   post,
 		"status": 200,
+	})
+}
+
+// SoftDelete blog post
+func SoftDelete(c *fiber.Ctx) error {
+	var post models.Blog
+
+	//parse post id from request parameters
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error":   "Invalid post id",
+			"message": err.Error(),
+		})
+	}
+
+	//First post ID in the database
+	if err := database.DB.First(&post, id).Error; err != nil {
+		// if post not found
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(404).JSON(fiber.Map{
+				"error":   "Post not found",
+				"message": err.Error(),
+			})
+		}
+		return c.Status(500).JSON(fiber.Map{
+			"error":   "Failed to fecth post",
+			"message": err.Error(),
+		})
+	}
+
+	//soft delete the post by setting DeletedAt field
+	if err := database.DB.Delete(&post).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error":   "Failed to soft delete post",
+			"message": err.Error(),
+		})
+	}
+
+	//Return success response
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Delete successfully",
+		"status":  200,
 	})
 }
