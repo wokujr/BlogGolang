@@ -3,7 +3,9 @@ package controllers
 import (
 	"ReactGo/src/database"
 	"ReactGo/src/models"
+	"errors"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 	"math"
 	"strconv"
 	"time"
@@ -32,7 +34,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 }
 
-func GetPost(c *fiber.Ctx) error {
+func Posts(c *fiber.Ctx) error {
 	var limit = 5
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	var blogs []models.Blog
@@ -68,5 +70,39 @@ func GetPost(c *fiber.Ctx) error {
 			"total_post": total,
 			"last_page":  lastPage,
 		},
+	})
+}
+
+func GetPost(c *fiber.Ctx) error {
+	var post models.Blog
+
+	//Parse post ID from request parameter
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error":   "Invalid Post Id",
+			"message": err.Error(),
+		})
+	}
+
+	//Find post by id in the database
+	if err := database.DB.First(&post, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Post not found, return 404 Not Found response
+			return c.Status(404).JSON(fiber.Map{
+				"error":   "Post not found",
+				"message": err.Error(),
+			})
+		}
+		// if another database error, it will return 500
+		return c.Status(500).JSON(fiber.Map{
+			"error":   "Failed to fetch",
+			"message": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"data":   post,
+		"status": 200,
 	})
 }

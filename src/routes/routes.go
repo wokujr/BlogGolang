@@ -26,5 +26,6 @@ func Setup(app *fiber.App) {
 
 	//Blog public API
 	var blog = api.Group("blog")
-	blog.Get("post", controllers.GetPost)
+	blog.Get("post", controllers.Posts)
+	blog.Get("post/:id", controllers.GetPost)
 }
