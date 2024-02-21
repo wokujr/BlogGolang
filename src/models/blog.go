@@ -12,5 +12,5 @@ type Blog struct {
 	Image     string         `json:"image"`
 	CreateAt  time.Time      `json:"create_at"`
 	UpdateAt  time.Time      `json:"update_at"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }

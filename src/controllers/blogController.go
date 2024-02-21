@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"ReactGo/src/controllers/helper"
 	"ReactGo/src/database"
 	"ReactGo/src/models"
 	"errors"
@@ -34,7 +35,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 }
 
-// Posts, get all blog post with 5 max per page
+// Posts get all blog post with 5 max per page
 func Posts(c *fiber.Ctx) error {
 	var limit = 5
 	page, _ := strconv.Atoi(c.Query("page", "1"))
@@ -189,4 +190,37 @@ func PermanentDeletePost(c *fiber.Ctx) error {
 		"message": "Post permanently deleted successfully",
 		"status":  200,
 	})
+}
+
+// RestorePost restore post that deleted with softdelete
+func RestorePost(c *fiber.Ctx) error {
+	id, err := helper.ParsePostID(c)
+	if err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid Post id")
+	}
+
+	post, err := helper.GetPostByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return helper.ErrorResponse(c, 404, err, "Post not found")
+		}
+		return helper.ErrorResponse(c, 500, err, "Failed to retrieve data from database")
+	}
+
+	//check if post already restored
+	if !post.DeletedAt.Valid {
+		return helper.ErrorResponse(c, 400, nil, "Post Already restored")
+	}
+
+	//Restore post by clearing DeletedAt field
+	if err := database.DB.Unscoped().Model(&post).Update("deleted_at", nil).Error; err != nil {
+		return helper.ErrorResponse(c, 500, err, "Failed to restore data from database")
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Post restored successfully",
+		"status":  200,
+		"data":    post,
+	})
+
 }

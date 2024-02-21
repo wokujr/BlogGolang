@@ -23,11 +23,12 @@ func Setup(app *fiber.App) {
 
 	//only admin that can post
 	adminAuthenticated.Post("blog/create", controllers.CreatePost)
+	adminAuthenticated.Delete("blog/post/:id", controllers.SoftDelete)
+	adminAuthenticated.Delete("blog/post/:id/permanent", controllers.PermanentDeletePost)
+	adminAuthenticated.Post("blog/post/restore/:id", controllers.RestorePost)
 
 	//Blog public API
 	var blog = api.Group("blog")
-	blog.Get("post", controllers.Posts)
+	blog.Get("posts", controllers.Posts)
 	blog.Get("post/:id", controllers.GetPost)
-	blog.Delete("post/:id", controllers.SoftDelete)
-	blog.Delete("post/:id/permanent", controllers.PermanentDeletePost)
 }
