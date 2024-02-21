@@ -1,4 +1,4 @@
-# GOlang CMS
+# GOlang Blog
 
 CMS that created with react and golang. <br>
 I code as hobby, so this repo might not get update. (and most of it not haha)<br>

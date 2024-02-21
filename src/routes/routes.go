@@ -28,4 +28,6 @@ func Setup(app *fiber.App) {
 	var blog = api.Group("blog")
 	blog.Get("post", controllers.Posts)
 	blog.Get("post/:id", controllers.GetPost)
+	blog.Delete("post/:id", controllers.SoftDelete)
+	blog.Delete("post/:id/permanent", controllers.PermanentDeletePost)
 }
