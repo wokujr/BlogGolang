@@ -117,33 +117,21 @@ func SoftDelete(c *fiber.Ctx) error {
 	//parse post id from request parameters
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error":   "Invalid post id",
-			"message": err.Error(),
-		})
+		return helper.ErrorResponse(c, 400, err, "Invalid Id")
 	}
 
 	//First post ID in the database
 	if err := database.DB.First(&post, id).Error; err != nil {
 		// if post not found
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(404).JSON(fiber.Map{
-				"error":   "Post not found",
-				"message": err.Error(),
-			})
+			return helper.ErrorResponse(c, 404, err, "Post not found")
 		}
-		return c.Status(500).JSON(fiber.Map{
-			"error":   "Failed to fecth post",
-			"message": err.Error(),
-		})
+		return helper.ErrorResponse(c, 500, err, "Failed to Fetch data")
 	}
 
 	//soft delete the post by setting DeletedAt field
 	if err := database.DB.Delete(&post).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error":   "Failed to soft delete post",
-			"message": err.Error(),
-		})
+		return helper.ErrorResponse(c, 500, err, "Failed to delete data")
 	}
 
 	//Return success response
@@ -159,35 +147,23 @@ func PermanentDeletePost(c *fiber.Ctx) error {
 
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error":   "Invalid Id",
-			"message": err.Error(),
-		})
+		return helper.ErrorResponse(c, 400, err, "Invalid Id")
 	}
 
 	if err := database.DB.Unscoped().First(&post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Post not found, return 404 Not Found response
-			return c.Status(404).JSON(fiber.Map{
-				"error":   "Post not found",
-				"message": err.Error(),
-			})
+			return helper.ErrorResponse(c, 404, err, "Post not found")
 		}
 		// Other database error occurred, return 500 Internal Server Error
-		return c.Status(500).JSON(fiber.Map{
-			"error":   "Failed to fetch post",
-			"message": err.Error(),
-		})
+		return helper.ErrorResponse(c, 500, err, "Failed to fetch data")
 	}
 	if err := database.DB.Unscoped().Delete(&post).Error; err != nil {
-		return c.Status(505).JSON(fiber.Map{
-			"error":   "Failed to permanently delete post",
-			"message": err.Error(),
-		})
+		return helper.ErrorResponse(c, 400, err, "Failed to delete data")
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"message": "Post permanently deleted successfully",
+		"message": "Post deleted Permanently",
 		"status":  200,
 	})
 }
