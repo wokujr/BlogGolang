@@ -4,35 +4,63 @@ import (
 	"ReactGo/src/controllers/helper"
 	"ReactGo/src/database"
 	"ReactGo/src/models"
+	"encoding/json"
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"math"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
 
 func CreatePost(c *fiber.Ctx) error {
-	var data map[string]string
-	if err := c.BodyParser(&data); err != nil {
-		return err
+	// Parse data both file and JSON
+	form, err := c.MultipartForm()
+	if err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid request")
 	}
 
-	post := models.Blog{
-		Title: data["title"],
-		Post:  data["post"],
-		Image: data["image"],
+	//Extract post data from form fields
+	postData := form.Value["postData"][0]
+
+	//Parse JSON
+	var post models.Blog
+	if err := json.Unmarshal([]byte(postData), &post); err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid JSON data")
 	}
-	post.CreateAt = time.Now()
 
-	database.DB.Create(&post)
+	//Handle file upload
+	imageFile := form.File["image"]
+	if len(imageFile) != 1 {
+		return helper.ErrorResponse(c, 400, err, "Please provide one image file")
+	}
 
+	//Move image to imageUpload
+	file := imageFile[0]
+	imageDir := "./imageUpload"
+	if err := os.MkdirAll(imageDir, os.ModePerm); err != nil {
+		return helper.ErrorResponse(c, 500, err, "Failed create image directory")
+	}
+	imageFilename := strconv.FormatInt(time.Now().Unix(), 10) + filepath.Ext(file.Filename)
+	imagePath := filepath.Join(imageDir, imageFilename)
+	if err := c.SaveFile(file, imagePath); err != nil {
+		return helper.ErrorResponse(c, 500, err, "Failed to save image file")
+	}
+
+	//Add image path to post
+	post.Image = imagePath
+
+	//Save the post to the database
+	if err := database.DB.Create(&postData).Error; err != nil {
+		return helper.ErrorResponse(c, 500, err, "Error failed to create post")
+	}
 	return c.Status(200).JSON(fiber.Map{
-		"message": "Created Successfully",
-		"post":    post,
+		"message": "post created successfully",
 		"status":  200,
+		"data":    postData,
 	})
-
 }
 
 // Posts get all blog post with 5 max per page
@@ -107,6 +135,63 @@ func GetPost(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"data":   post,
 		"status": 200,
+	})
+}
+
+// UpdatePost update blog posts
+func UpdatePost(c *fiber.Ctx) error {
+	id, err := helper.ParsePostID(c)
+	if err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid post Id")
+	}
+
+	//Retrieve post by id
+	post, err := helper.GetPostByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return helper.ErrorResponse(c, 404, err, "Post not found")
+		}
+		return helper.ErrorResponse(c, 500, err, "Failed to fetch post data")
+	}
+
+	var postData models.Blog
+	if err := c.BodyParser(&postData); err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid request")
+	}
+
+	post.Title = postData.Title
+	post.Post = postData.Post
+	post.Image = postData.Image
+	post.Tags = postData.Tags
+
+	if err := database.DB.Save(&post).Error; err != nil {
+		return helper.ErrorResponse(c, 500, err, "Internal server error")
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Update successfully",
+		"status":  200,
+		"data":    post,
+	})
+}
+
+// SearchPost function that look for post that match from title and post body
+func SearchPost(c *fiber.Ctx) error {
+	//get the search query from request query parameter
+	query := c.Query("s") //s, stand for search
+	if query == "" {
+		return helper.ErrorResponse(c, 400, nil, "Search query is required")
+	}
+
+	//Perform a case-sensitive post that containing search query string
+	var posts []models.Blog
+	if err := database.DB.Where("title ILIKE ? OR post ILIKE ?", "%"+query+"%", "%"+query+"%").Find(&posts).Error; err != nil {
+		return helper.ErrorResponse(c, 404, err, "Failed to search post")
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Search result",
+		"status":  200,
+		"data":    posts,
 	})
 }
 
@@ -198,5 +283,36 @@ func RestorePost(c *fiber.Ctx) error {
 		"status":  200,
 		"data":    post,
 	})
+}
 
+func CreateCategory(c *fiber.Ctx) error {
+	var category models.Category
+	if err := c.BodyParser(&category); err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid category")
+	}
+
+	if err := database.DB.Create(&category).Error; err != nil {
+		return helper.ErrorResponse(c, 500, err, "Failed to create Category")
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Category created successfully",
+		"status":  200,
+		"data":    category,
+	})
+}
+
+func CreateTag(c *fiber.Ctx) error {
+	var tag models.Tag
+	if err := c.BodyParser(&tag); err != nil {
+		return helper.ErrorResponse(c, 400, err, "Invalid Tags")
+	}
+	if err := database.DB.Create(&tag).Error; err != nil {
+		return helper.ErrorResponse(c, 500, err, "Failed to create Tag")
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Tag created successfully",
+		"status":  200,
+		"data":    tag,
+	})
 }
