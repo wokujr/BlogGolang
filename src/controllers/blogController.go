@@ -5,11 +5,11 @@ import (
 	"ReactGo/src/database"
 	"ReactGo/src/models"
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 	"gorm.io/gorm"
-	"log"
 	"math"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -18,12 +18,13 @@ import (
 
 var baseURL string
 
-func init() {
-	err := godotenv.Load()
+func generateRandomName() string {
+	randomByte := make([]byte, 16)
+	_, err := rand.Read(randomByte)
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return fmt.Sprintf("random%d", time.Now().UnixNano())
 	}
-	baseURL = os.Getenv("BASE_URL")
+	return fmt.Sprintf("%x", randomByte)
 }
 
 func CreatePost(c *fiber.Ctx) error {
@@ -46,7 +47,12 @@ func CreatePost(c *fiber.Ctx) error {
 
 	for _, file := range files {
 		// Generate unique name
-		fileName := filepath.Join(uploadDir, file.Filename) // corrected directory name
+		randomName := generateRandomName() + filepath.Ext(file.Filename)
+		if err != nil {
+			return helper.ErrorResponse(c, 500, err, "Failed to generate random name")
+		}
+
+		fileName := filepath.Join(uploadDir, randomName) // corrected directory name
 		// Save the file to imageUpload directory
 		if err := c.SaveFile(file, fileName); err != nil {
 			return helper.ErrorResponse(c, 400, err, "Failed to upload")

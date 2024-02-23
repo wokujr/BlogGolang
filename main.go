@@ -5,9 +5,17 @@ import (
 	"ReactGo/src/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
+	"log"
+	"os"
 )
 
 func main() {
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	database.Connect()
 	database.AutoMigration()
@@ -18,8 +26,10 @@ func main() {
 	}))
 	routes.Setup(app) //From routes.go
 
-	err := app.Listen(":8000")
-	if err != nil {
-		return
-	}
+	// Serve static files
+	app.Static("/uploadImage", "./uploadImage")
+
+	// Start the server
+	port := os.Getenv("PORT")
+	log.Fatal(app.Listen(":" + port))
 }
