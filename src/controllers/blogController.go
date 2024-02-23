@@ -4,10 +4,11 @@ import (
 	"ReactGo/src/controllers/helper"
 	"ReactGo/src/database"
 	"ReactGo/src/models"
-	"encoding/json"
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -15,51 +16,58 @@ import (
 	"time"
 )
 
+var baseURL string
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	baseURL = os.Getenv("BASE_URL")
+}
+
 func CreatePost(c *fiber.Ctx) error {
-	// Parse data both file and JSON
 	form, err := c.MultipartForm()
 	if err != nil {
 		return helper.ErrorResponse(c, 400, err, "Invalid request")
 	}
 
-	//Extract post data from form fields
-	postData := form.Value["postData"][0]
+	files := form.File["image"]
+	var posts []models.Blog // slice to hold created posts
 
-	//Parse JSON
-	var post models.Blog
-	if err := json.Unmarshal([]byte(postData), &post); err != nil {
-		return helper.ErrorResponse(c, 400, err, "Invalid JSON data")
+	// Check if the directory exists, create it if not
+	uploadDir := "./uploadImage"
+	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+		err := os.Mkdir(uploadDir, 0755) // adjust permissions as needed
+		if err != nil {
+			return helper.ErrorResponse(c, 500, err, "Failed to create upload directory")
+		}
 	}
 
-	//Handle file upload
-	imageFile := form.File["image"]
-	if len(imageFile) != 1 {
-		return helper.ErrorResponse(c, 400, err, "Please provide one image file")
+	for _, file := range files {
+		// Generate unique name
+		fileName := filepath.Join(uploadDir, file.Filename) // corrected directory name
+		// Save the file to imageUpload directory
+		if err := c.SaveFile(file, fileName); err != nil {
+			return helper.ErrorResponse(c, 400, err, "Failed to upload")
+		}
+
+		// Create new post
+		post := models.Blog{
+			Title:    form.Value["title"][0],
+			Post:     form.Value["post"][0],
+			Image:    fileName,
+			CreateAt: time.Now(),
+			UpdateAt: time.Now(),
+		}
+		database.DB.Create(&post)
+		posts = append(posts, post) // append created post to slice
 	}
 
-	//Move image to imageUpload
-	file := imageFile[0]
-	imageDir := "./imageUpload"
-	if err := os.MkdirAll(imageDir, os.ModePerm); err != nil {
-		return helper.ErrorResponse(c, 500, err, "Failed create image directory")
-	}
-	imageFilename := strconv.FormatInt(time.Now().Unix(), 10) + filepath.Ext(file.Filename)
-	imagePath := filepath.Join(imageDir, imageFilename)
-	if err := c.SaveFile(file, imagePath); err != nil {
-		return helper.ErrorResponse(c, 500, err, "Failed to save image file")
-	}
-
-	//Add image path to post
-	post.Image = imagePath
-
-	//Save the post to the database
-	if err := database.DB.Create(&postData).Error; err != nil {
-		return helper.ErrorResponse(c, 500, err, "Error failed to create post")
-	}
 	return c.Status(200).JSON(fiber.Map{
-		"message": "post created successfully",
+		"message": "Post created successfully",
 		"status":  200,
-		"data":    postData,
+		"data":    posts,
 	})
 }
 
@@ -91,6 +99,11 @@ func Posts(c *fiber.Ctx) error {
 			"message": "Page not found",
 			"status":  400,
 		})
+	}
+
+	// Update each blog Image field with the full image URL
+	for i := range blogs {
+		blogs[i].Image = baseURL + "/" + blogs[i].Image
 	}
 
 	return c.Status(200).JSON(fiber.Map{
