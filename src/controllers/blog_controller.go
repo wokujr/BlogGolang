@@ -79,10 +79,14 @@ func CreatePost(c *fiber.Ctx) error {
 			if err := database.DB.First(&category, categoryID).Error; err != nil {
 				return helper.ErrorResponse(c, 400, err, "Category not found")
 			}
-			database.DB.Model(&post).Association("Categories").Append(&category)
+			post.Category = append(post.Category, &category)
 		}
 
-		posts = append(posts, post) // append created post to slice
+		// Save the updated post with the category
+		if err := database.DB.Save(&post).Error; err != nil {
+			return helper.ErrorResponse(c, 400, err, "Failed to save post with category")
+		}
+		posts = append(posts, post)
 	}
 
 	return c.Status(200).JSON(fiber.Map{
@@ -101,7 +105,7 @@ func Posts(c *fiber.Ctx) error {
 	var total int64
 
 	//retrieve records
-	result := database.DB.Offset(offset).Limit(limit).Find(&blogs)
+	result := database.DB.Offset(offset).Limit(limit).Preload("Category").Find(&blogs)
 	if result.Error != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"message": result.Error.Error(),
@@ -204,8 +208,13 @@ func UpdatePost(c *fiber.Ctx) error {
 
 	// Update Categories
 	var categories []*models.Category
-	database.DB.Find(&categories, postData.CategoryIDs)
-	post.Categories = categories
+	for _, catId := range postData.CategoryIDs {
+		category := &models.Category{}
+		if err := database.DB.First(category, catId).Error; err != nil {
+			return helper.ErrorResponse(c, 400, err, "Invalid Category ID")
+		}
+		categories = append(categories, category)
+	}
 
 	if err := database.DB.Save(&post).Error; err != nil {
 		return helper.ErrorResponse(c, 500, err, "Internal server error")
@@ -328,6 +337,7 @@ func RestorePost(c *fiber.Ctx) error {
 	})
 }
 
+// CreateCategory create category
 func CreateCategory(c *fiber.Ctx) error {
 	var category models.Category
 	if err := c.BodyParser(&category); err != nil {
