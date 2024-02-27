@@ -30,7 +30,7 @@ func Connect() {
 }
 
 func AutoMigration() {
-	err := DB.AutoMigrate(&models.User{}, &models.Blog{})
+	err := DB.AutoMigrate(&models.User{}, &models.Blog{}, &models.Category{})
 	if err != nil {
 		log.Fatal("Migration Error: ", err)
 	}

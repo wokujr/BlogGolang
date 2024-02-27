@@ -3,8 +3,11 @@ package helper
 import (
 	"ReactGo/src/database"
 	"ReactGo/src/models"
+	"crypto/rand"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
+	"time"
 )
 
 // ParsePostID parses the post ID from the request parameters
@@ -31,4 +34,13 @@ func ErrorResponse(c *fiber.Ctx, status int, err error, errorMessage string) err
 		"message": err.Error(),
 		"status":  status,
 	})
+}
+
+func GenerateRandomName() string {
+	randomByte := make([]byte, 16)
+	_, err := rand.Read(randomByte)
+	if err != nil {
+		return fmt.Sprintf("random%d", time.Now().UnixNano())
+	}
+	return fmt.Sprintf("%x", randomByte)
 }

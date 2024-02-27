@@ -5,11 +5,9 @@ import (
 	"ReactGo/src/database"
 	"ReactGo/src/models"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"math"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -17,15 +15,6 @@ import (
 )
 
 var baseURL string
-
-func generateRandomName() string {
-	randomByte := make([]byte, 16)
-	_, err := rand.Read(randomByte)
-	if err != nil {
-		return fmt.Sprintf("random%d", time.Now().UnixNano())
-	}
-	return fmt.Sprintf("%x", randomByte)
-}
 
 func CreatePost(c *fiber.Ctx) error {
 	form, err := c.MultipartForm()
@@ -47,7 +36,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 	for _, file := range files {
 		// Generate unique name
-		randomName := generateRandomName() + filepath.Ext(file.Filename)
+		randomName := helper.GenerateRandomName() + filepath.Ext(file.Filename)
 		if err != nil {
 			return helper.ErrorResponse(c, 500, err, "Failed to generate random name")
 		}
@@ -66,7 +55,33 @@ func CreatePost(c *fiber.Ctx) error {
 			CreateAt: time.Now(),
 			UpdateAt: time.Now(),
 		}
-		database.DB.Create(&post)
+
+		// Create the post in the database
+		if err := database.DB.Create(&post).Error; err != nil {
+			return helper.ErrorResponse(c, 500, err, "Failed to create post")
+		}
+
+		// Get category IDs from the request body
+		var categoryIDs []uint
+		if catIDs, ok := form.Value["category_ids"]; ok {
+			for _, id := range catIDs {
+				catID, err := strconv.ParseUint(id, 10, 32)
+				if err != nil {
+					return helper.ErrorResponse(c, 400, err, "Invalid category ID")
+				}
+				categoryIDs = append(categoryIDs, uint(catID))
+			}
+		}
+
+		// Associate categories with the post
+		for _, categoryID := range categoryIDs {
+			var category models.Category
+			if err := database.DB.First(&category, categoryID).Error; err != nil {
+				return helper.ErrorResponse(c, 400, err, "Category not found")
+			}
+			database.DB.Model(&post).Association("Categories").Append(&category)
+		}
+
 		posts = append(posts, post) // append created post to slice
 	}
 
@@ -173,7 +188,12 @@ func UpdatePost(c *fiber.Ctx) error {
 		return helper.ErrorResponse(c, 500, err, "Failed to fetch post data")
 	}
 
-	var postData models.Blog
+	var postData struct {
+		Title       string `json:"title"`
+		Post        string `json:"post"`
+		Image       string `json:"image"`
+		CategoryIDs []uint `json:"category_ids"`
+	}
 	if err := c.BodyParser(&postData); err != nil {
 		return helper.ErrorResponse(c, 400, err, "Invalid request")
 	}
@@ -181,7 +201,11 @@ func UpdatePost(c *fiber.Ctx) error {
 	post.Title = postData.Title
 	post.Post = postData.Post
 	post.Image = postData.Image
-	post.Tags = postData.Tags
+
+	// Update Categories
+	var categories []*models.Category
+	database.DB.Find(&categories, postData.CategoryIDs)
+	post.Categories = categories
 
 	if err := database.DB.Save(&post).Error; err != nil {
 		return helper.ErrorResponse(c, 500, err, "Internal server error")
@@ -318,20 +342,5 @@ func CreateCategory(c *fiber.Ctx) error {
 		"message": "Category created successfully",
 		"status":  200,
 		"data":    category,
-	})
-}
-
-func CreateTag(c *fiber.Ctx) error {
-	var tag models.Tag
-	if err := c.BodyParser(&tag); err != nil {
-		return helper.ErrorResponse(c, 400, err, "Invalid Tags")
-	}
-	if err := database.DB.Create(&tag).Error; err != nil {
-		return helper.ErrorResponse(c, 500, err, "Failed to create Tag")
-	}
-	return c.Status(200).JSON(fiber.Map{
-		"message": "Tag created successfully",
-		"status":  200,
-		"data":    tag,
 	})
 }

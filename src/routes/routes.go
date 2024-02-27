@@ -28,7 +28,6 @@ func Setup(app *fiber.App) {
 	adminAuthenticated.Post("blog/post/restore/:id", controllers.RestorePost)
 	adminAuthenticated.Put("blog/post/update/:id", controllers.UpdatePost)
 	adminAuthenticated.Post("blog/category", controllers.CreateCategory)
-	adminAuthenticated.Post("blog/tag", controllers.CreateTag)
 
 	//Blog public API
 	var blog = api.Group("blog") //so it will be api/blog/

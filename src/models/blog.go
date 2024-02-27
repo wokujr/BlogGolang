@@ -13,18 +13,11 @@ type Blog struct {
 	CreateAt   time.Time      `json:"create_at"`
 	UpdateAt   time.Time      `json:"update_at"`
 	DeletedAt  gorm.DeletedAt `json:"deleted_at" gorm:"index"`
-	Categories []Category     `gorm:"many2many:blog_categories"`
-	Tags       []Tag          `gorm:"many2many:blog_tags"`
-}
-
-type Tag struct {
-	gorm.Model
-	TagName string `gorm:"unique" json:"tag"`
-	Posts   []Blog `gorm:"many2many:blog_tags;"`
+	Categories []*Category    `gorm:"many2many:blog_categories"`
 }
 
 type Category struct {
 	gorm.Model
-	CategoryName string `gorm:"unique" json:"category"`
-	Blogs        []Blog `gorm:"many2many:blog_categories;"`
+	CategoryName string  `gorm:"unique" json:"category"`
+	Blogs        []*Blog `gorm:"many2many:blog_categories;"`
 }
