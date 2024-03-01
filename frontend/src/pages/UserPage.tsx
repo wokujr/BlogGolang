@@ -48,7 +48,7 @@ export default function UserPage() {
                             {weather}
                         </div>
                         <div className="flex-col mb-2 text-xl">
-                            {temperature} Celcius
+                            {temperature} Celsius
                         </div>
                     </div>
                 </div>
