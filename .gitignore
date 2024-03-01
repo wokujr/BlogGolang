@@ -1,5 +1,5 @@
 
-# User-specific stuff
+# UserPage-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -14,6 +14,8 @@ pre_cmd.txt
 .idea
 tmp
 uploadImage
+
+frontend/package-lock.json
 
 # Logs
 logs
@@ -39,7 +41,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# AWS User-specific
+# AWS UserPage-specific
 .idea/**/aws.xml
 
 # Generated files
@@ -126,14 +128,14 @@ fabric.properties
 # Go workspace file
 go.work
 
-# User-specific stuff
+# UserPage-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
 
-# AWS User-specific
+# AWS UserPage-specific
 .idea/**/aws.xml
 
 # Generated files
@@ -201,14 +203,14 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-# User-specific stuff
+# UserPage-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
 
-# AWS User-specific
+# AWS UserPage-specific
 .idea/**/aws.xml
 
 # Generated files

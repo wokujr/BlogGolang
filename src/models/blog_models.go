@@ -17,7 +17,7 @@ type Blog struct {
 }
 
 type Category struct {
-	gorm.Model
+	Id           uint    `gorm:"primaryKey;" json:"id" `
 	CategoryName string  `gorm:"unique" json:"category"`
 	Blogs        []*Blog `gorm:"many2many:blog_categories;" json:"blogs"`
 }

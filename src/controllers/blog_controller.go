@@ -155,7 +155,7 @@ func GetPost(c *fiber.Ctx) error {
 	}
 
 	//Find post by id in the database
-	if err := database.DB.First(&post, id).Error; err != nil {
+	if err := database.DB.Preload("Category").First(&post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Post not found, return 404 Not Found response
 			return c.Status(404).JSON(fiber.Map{
