@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
+import UserPage from "../pages/UserPage.tsx";
 
 const Dashboard: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<string>("Home");
@@ -15,8 +16,10 @@ const Dashboard: React.FC = () => {
                 return <div>Home Content</div>;
             case "Analytics":
                 return <div>Analytics Content</div>;
-            case "Settings":
+            case "Setting":
                 return <div>Settings Content</div>;
+            case "User":
+                return <UserPage />
             default:
                 return null;
         }
@@ -26,7 +29,7 @@ const Dashboard: React.FC = () => {
         <div className="flex h-screen">
             <Sidebar onItemClick={handleItemClick} />
             <div className="flex-grow p-4">
-                <h1 className="text-2xl font-bold mb-4">Welcome to the Dashboard</h1>
+                <h1 className="text-4xl text-center font-bold mt-2 mb-4">Welcome to the Dashboard</h1>
                 {renderContent()}
             </div>
         </div>

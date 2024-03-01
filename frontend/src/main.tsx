@@ -4,6 +4,9 @@ import './index.css'
 
 import {RouterProvider} from "react-router-dom"
 import {router} from "./routes/AppRoute.tsx";
+import axios from "axios";
+
+axios.defaults.baseURL = "http://localhost:8000/api/"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
