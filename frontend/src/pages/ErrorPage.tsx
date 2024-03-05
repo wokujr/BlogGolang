@@ -1,9 +1,10 @@
+import {Link} from "react-router-dom";
 
 export default function ErrorPage () {
 
     return (
         <>
-            <section className="relative z-10 bg-primary py-[120px]">
+            <main className="absolute inset-0  z-10 bg-black flex justify-center items-center py-[120px]">
                 <div className="container mx-auto">
                     <div className="-mx-4 flex">
                         <div className="w-full px-4">
@@ -17,17 +18,15 @@ export default function ErrorPage () {
                                 <p className="mb-8 text-lg text-white">
                                     The page you are looking for it maybe deleted
                                 </p>
-                                <a
-                                    href="javascript:void(0)"
-                                    className="inline-block rounded-lg border border-white px-8 py-3 text-center text-base font-semibold text-white transition hover:bg-white hover:text-primary"
+                                <Link to="/"
+                                    className="inline-block rounded-lg border border-cyan-600 px-8 py-3 text-center text-base font-semibold text-white transition hover:bg-white hover:text-black"
                                 >
                                     Go To Home
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div
                     className="absolute left-0 top-0 -z-10 flex h-full w-full items-center justify-between space-x-5 md:space-x-8 lg:space-x-14">
                     <div className="h-full w-1/3 bg-gradient-to-t from-[#FFFFFF14] to-[#C4C4C400]"></div>
@@ -37,7 +36,7 @@ export default function ErrorPage () {
                     </div>
                     <div className="h-full w-1/3 bg-gradient-to-b from-[#FFFFFF14] to-[#C4C4C400]"></div>
                 </div>
-            </section>
+            </main>
         </>
     )
 }
