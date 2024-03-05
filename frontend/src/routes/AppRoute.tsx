@@ -1,30 +1,18 @@
 import {createBrowserRouter} from "react-router-dom"
-import Dashboard from "../components/Dashboard.tsx";
-import UserPage from "../pages/UserPage.tsx";
 import LoginPage from "../pages/LoginPage.tsx";
-import App from "../App.tsx";
+import HomePage from "../pages/HomePage.tsx";
+import DashboardPage from "../pages/admin_components/DashboardPage.tsx";
+import ErrorPage from "../pages/ErrorPage.tsx";
 
-export const router = createBrowserRouter([
-    // {
-    //     path:"/",
-    //     element:<App />,
-    //     children: [
-    //         {path:"dashboard", element:<Dashboard />},
-    //         {path:"user", element:<UserPage />},
-    //         {path:"login", element:<LoginPage />},
-    //     ]
-    // }
-
+export const Router = createBrowserRouter([
     {
-        path:"/", element: <App />
+        path: "/",
+        element: <HomePage />,
+        errorElement:<ErrorPage />
     },
+    {path: "/login", element: <LoginPage />},
     {
-        path: "/dashboard", element:<Dashboard />
-    },
-    {
-        path: "/login", element: <LoginPage />
-    },
-    {
-        path: "/user", element: <UserPage />
+        path: "/admin",
+        element: <DashboardPage />,
     }
 ])

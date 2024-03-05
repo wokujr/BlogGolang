@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
-import UserPage from "../pages/UserPage.tsx";
+import Sidebar from '../../components/Sidebar.tsx';
+import UserDashboard from "./UserDashboard.tsx";
+import HomeDashboard from "./HomeDashboard.tsx";
+import AnalyticDashboard from "./AnalyticDashboard.tsx";
 
-const Dashboard: React.FC = () => {
+const DashboardPage: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<string>("Home");
 
     const handleItemClick = (item: string) => {
@@ -13,13 +15,11 @@ const Dashboard: React.FC = () => {
     const renderContent = () => {
         switch (selectedItem) {
             case "Home":
-                return <div>Home Content</div>;
+                return <HomeDashboard />;
             case "Analytics":
-                return <div>Analytics Content</div>;
-            case "Setting":
-                return <div>Settings Content</div>;
+                return <AnalyticDashboard />;
             case "User":
-                return <UserPage />
+                return <UserDashboard />
             default:
                 return null;
         }
@@ -36,4 +36,4 @@ const Dashboard: React.FC = () => {
     );
 };
 
-export default Dashboard;
+export default DashboardPage;

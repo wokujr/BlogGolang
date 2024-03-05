@@ -15,20 +15,18 @@ export default function LoginPage() {
             await axios.post('/admin/login', {
                 email,
                 password
-            }, {
-                withCredentials: true,
             });
+
             setRedirect(true);
+
         } catch (error) {
             console.error('Login failed:', error);
-            // Handle login failure (e.g., display error message to user)
         }
     }
 
-
     if (redirect) {
         // Redirect to the desired page after successful login
-        navigate("/");
+        navigate("/dashboard");
         return null; // Return null since we're handling redirection outside JSX
     }
 

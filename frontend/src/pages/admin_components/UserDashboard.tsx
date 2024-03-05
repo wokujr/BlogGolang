@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 
-export default function UserPage() {
+export default function UserDashboard() {
 
     const [currentDay, setCurrentDay] = useState('');
     const [currentDate, setCurrentDate] = useState('');
@@ -21,14 +21,21 @@ export default function UserPage() {
         axios.get(`https://api.openweathermap.org/data/2.5/weather?q=fukuoka&appid=9b4b401ebe8c9a87967b2522f697767c&units=metric&lang=ja`)
             .then(response => {
                 const weatherDescription = response.data.weather[0].description;
-                const temperatureData = response.data.main.temp
-                setWeather(weatherDescription)
+                const temperatureData = response.data.main.temp;
+                setWeather(weatherDescription);
                 setTemperature(temperatureData);
             })
             .catch(error => {
-                console.error('Error fetching weather data =', error)
+                console.error('Error fetching weather data =', error);
             })
-    })
+
+        axios.get("admin/user")
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => console.error("Error fetching data = ", error));
+
+    }, [])
 
     return (
         <main>
