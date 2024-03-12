@@ -8,19 +8,22 @@ import LayoutPage from "../pages/LayoutPage.tsx";
 export const Router = createBrowserRouter([
     {
         path: "/",
-        element: <LayoutPage />,
-        errorElement:<ErrorPage />,
-        children:[
+        element: <LayoutPage/>,
+        errorElement: <ErrorPage/>,
+        children: [
             {
                 path: "blog",
             }
         ]
     },
-    { path:"/about", element: <AboutmePage />},
+    {
+        path: "/about",
+        element: <AboutmePage/>,
+    },
 
-    {path: "/login", element: <LoginPage />},
+    {path: "/login", element: <LoginPage/>},
     {
         path: "/admin",
-        element: <DashboardPage />,
+        element: <DashboardPage/>,
     },
 ])
