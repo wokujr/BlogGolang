@@ -6,7 +6,7 @@ const Navbar: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
     return (
-        <nav className="bg-black">
+        <nav className="bg-black shadow-lg shadow-white/[0.03] backdrop-blur-[0.5rem] sm:top-6 sm:h-[4rem] sm::w-[36rem]">
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div className="relative flex h-16 items-center justify-between">
                     <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -28,19 +28,19 @@ const Navbar: React.FC = () => {
                         </button>
                     </div>
                     <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                        <div className="flex flex-shrink-0 items-center">
-                            <Link to="/"> <img className="h-8 w-auto" src="/kuroyuki.png" alt="Kuroyuki"/> </Link>
+                        <div className={`flex flex-shrink-0 items-center`}>
+                            <Link to="/"> <img className={`h-8 w-auto`} src="/kuroyuki.png" alt="Kuroyuki"/> </Link>
                         </div>
                         <div className="hidde sm:ml-6 sm:block flex-grow mx-auto">
                             <div className="flex justify-center space-x-4">
                                 <Link to="/" className="bg-gray-900 text-white rounded-md px-3 py-2 text-xl font-medium" aria-current="page">Home</Link>
                                 <Link to="/blog" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-xl font-medium">Blog</Link>
                                 <Link to="/japan" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-xl font-medium">Japan</Link>
-                                <Link to="/aboutme" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-xl font-medium">About me</Link>
+                                <Link to="/about" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-xl font-medium">About me</Link>
                             </div>
                         </div>
+                        <SearchButton />
                     </div>
-                    <SearchButton />
                 </div>
             </div>
             <div className={`sm:hidden ${isMobileMenuOpen ? '' : 'hidden'}`} id="mobile-menu">

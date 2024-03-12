@@ -1,5 +1,5 @@
 
-# UserPage-specific stuff
+# UserDashboard-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -41,7 +41,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# AWS UserPage-specific
+# AWS UserDashboard-specific
 .idea/**/aws.xml
 
 # Generated files
@@ -128,14 +128,14 @@ fabric.properties
 # Go workspace file
 go.work
 
-# UserPage-specific stuff
+# UserDashboard-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
 
-# AWS UserPage-specific
+# AWS UserDashboard-specific
 .idea/**/aws.xml
 
 # Generated files
@@ -203,14 +203,14 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-# UserPage-specific stuff
+# UserDashboard-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
 
-# AWS UserPage-specific
+# AWS UserDashboard-specific
 .idea/**/aws.xml
 
 # Generated files
