@@ -14,6 +14,9 @@ export default function Sidebar({ onItemClick }: { onItemClick: (item: string) =
                     <li className="mb-3 cursor-pointer" onClick={() => onItemClick("Analytics")}><FontAwesomeIcon
                         icon={fas.faChartPie} className="mx-3"/> Analytics
                     </li>
+                    <li className="mb-3 cursor-pointer" onClick={() => onItemClick("Blog")}><FontAwesomeIcon
+                        icon={fas.faBook} className="mx-3"/> Blog Post
+                    </li>
                     <li className="cursor-pointer" onClick={() => onItemClick("User")}>
                         <FontAwesomeIcon icon={fas.faUser} className="mx-3"/> User
                     </li>
@@ -22,7 +25,7 @@ export default function Sidebar({ onItemClick }: { onItemClick: (item: string) =
                 {/* Logout Item */}
                 <div className="mt-auto text-white p-6 mx-4">
                     <ul>
-                        <li className="cursor-pointer" onClick={() => onItemClick("User")}>
+                        <li className="cursor-pointer" onClick={() => onItemClick("Logout")}>
                             <FontAwesomeIcon icon={fas.faPowerOff} className="mx-3"/> Logout
                         </li>
                     </ul>

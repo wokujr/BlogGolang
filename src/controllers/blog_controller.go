@@ -61,22 +61,13 @@ func CreatePost(c *fiber.Ctx) error {
 			return helper.ErrorResponse(c, 500, err, "Failed to create post")
 		}
 
-		// Get category IDs from the request body
-		var categoryIDs []uint
-		if catIDs, ok := form.Value["category_ids"]; ok {
-			for _, id := range catIDs {
-				catID, err := strconv.ParseUint(id, 10, 32)
-				if err != nil {
-					return helper.ErrorResponse(c, 400, err, "Invalid category ID")
-				}
-				categoryIDs = append(categoryIDs, uint(catID))
-			}
-		}
+		// Get category name from the request body
+		categories := form.Value["category"]
 
 		// Associate categories with the post
-		for _, categoryID := range categoryIDs {
+		for _, categoryName := range categories {
 			var category models.Category
-			if err := database.DB.First(&category, categoryID).Error; err != nil {
+			if err := database.DB.Where("category_name = ?", categoryName).First(&category).Error; err != nil {
 				return helper.ErrorResponse(c, 400, err, "Category not found")
 			}
 			post.Category = append(post.Category, &category)
@@ -132,7 +123,7 @@ func Posts(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"data": blogs,
+		"blogData": blogs,
 		"meta": fiber.Map{
 			"page":       page,
 			"total_post": total,
@@ -171,8 +162,8 @@ func GetPost(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"data":   post,
-		"status": 200,
+		"blogData": post,
+		"status":   200,
 	})
 }
 
@@ -352,5 +343,18 @@ func CreateCategory(c *fiber.Ctx) error {
 		"message": "Category created successfully",
 		"status":  200,
 		"data":    category,
+	})
+}
+
+func GetAllCategoriesWithBlogs(c *fiber.Ctx) error {
+	var categories []models.Category
+	if err := database.DB.Preload("Blogs").Find(&categories).Error; err != nil {
+		return helper.ErrorResponse(c, 500, err, "Failed to fetch categories with blogs")
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Categories fetched successfully with blogs",
+		"status":  200,
+		"data":    categories,
 	})
 }

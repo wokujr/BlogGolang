@@ -12,13 +12,13 @@ export default function AboutMeIntro() {
                     />
                 </motion.div>
             </div>
-            <motion.p className="mb-10 mt-4 px-4 text-xl font-medium leading-[1.5] sm:text-2xl"
+            <motion.div className="mb-10 mt-4 px-4 text-xl font-medium leading-[1.5] sm:text-2xl"
                       initial={{opacity:0, y:100}}
                       animate={{opacity:1, y:0}}
             >
                 <span className="font-bold"> Hello Iam SiSum </span> <br/>
                 <span className="font-bold"> Iam NOT fullstack or software engineer, just a dude who like to code and hope for career change someday</span>
-            </motion.p>
+            </motion.div>
             <motion.div className={`flex flex-col sm:flex-row items-center justify-center font-medium text-lg px-4 gap-4`}
                         initial={{opacity:0, y:100}}
                         animate={{opacity:1, y:0}}

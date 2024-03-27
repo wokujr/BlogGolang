@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import Sidebar from '../../components/Sidebar.tsx';
+import Sidebar from './Sidebar.tsx';
 import UserDashboard from "./UserDashboard.tsx";
 import HomeDashboard from "./HomeDashboard.tsx";
 import AnalyticDashboard from "./AnalyticDashboard.tsx";
+import BlogPost from "./BlogPost/BlogPost.tsx";
 
 const DashboardPage: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<string>("Home");
@@ -18,6 +19,8 @@ const DashboardPage: React.FC = () => {
                 return <HomeDashboard />;
             case "Analytics":
                 return <AnalyticDashboard />;
+            case "Blog":
+                return <BlogPost />;
             case "User":
                 return <UserDashboard />
             default:

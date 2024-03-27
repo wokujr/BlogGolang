@@ -7,7 +7,7 @@ export default function About() {
                         animate={{opacity: 1, y: 0}}
                         id="me">
             <h2 className="text-center text-3xl"> About me</h2>
-            <motion.p className="px-4"
+            <motion.div className="px-4"
                       initial={{opacity: 0, y: 100}}
                       animate={{opacity: 1, y: 0}}>
                 <div className="mx-auto lg:px-64">
@@ -45,7 +45,7 @@ export default function About() {
                     </div>
                 </div>
 
-            </motion.p>
+            </motion.div>
         </motion.section>
     );
 }

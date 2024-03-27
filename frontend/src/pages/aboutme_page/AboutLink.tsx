@@ -1,6 +1,10 @@
 
 export const AboutLinks = [
     {
+        name:"Home",
+        hash:'/'
+    },
+    {
         name:"About",
         hash:'#me'
     },

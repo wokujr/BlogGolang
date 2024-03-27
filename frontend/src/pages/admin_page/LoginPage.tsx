@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     if (redirect) {
         // Redirect to the desired page after successful login
-        navigate("/dashboard");
+        navigate("/admin");
         return null; // Return null since we're handling redirection outside JSX
     }
 

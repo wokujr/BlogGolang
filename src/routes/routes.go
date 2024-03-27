@@ -34,4 +34,5 @@ func Setup(app *fiber.App) {
 	blog.Get("posts", controllers.Posts)
 	blog.Get("post/:id", controllers.GetPost)
 	blog.Get("/search", controllers.SearchPost)
+	blog.Get("/categories", controllers.GetAllCategoriesWithBlogs)
 }

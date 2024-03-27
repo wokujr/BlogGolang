@@ -4,6 +4,8 @@ import DashboardPage from "../pages/admin_page/DashboardPage.tsx";
 import ErrorPage from "../pages/ErrorPage.tsx";
 import AboutmePage from "../pages/aboutme_page/AboutmePage.tsx";
 import LayoutPage from "../pages/LayoutPage.tsx";
+import BlogPage from "../pages/blog_page/BlogPage.tsx";
+import JapaPage from "../pages/japan_page/JapaPage.tsx";
 
 export const Router = createBrowserRouter([
     {
@@ -13,9 +15,15 @@ export const Router = createBrowserRouter([
         children: [
             {
                 path: "blog",
+                element: <BlogPage/>,
+            },
+            {
+                path: "japan",
+                element: <JapaPage/>,
             }
         ]
     },
+
     {
         path: "/about",
         element: <AboutmePage/>,
