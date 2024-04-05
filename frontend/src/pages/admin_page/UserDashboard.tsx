@@ -25,8 +25,8 @@ export default function UserDashboard() {
     }, [])
 
     return (
-        <main>
-            <div className="flex max-w-md mx-auto mt-4 text-2xl text-white flex-row">
+        <section className="mx-auto mt-8">
+            <div className="flex max-w-md mx-auto mt-4 text-2xl text-white flex-row ">
                 <div className="flex-col mx-2">
                     <div className="flex-row">
                         <div className="flex-col mb-2">
@@ -48,7 +48,7 @@ export default function UserDashboard() {
                     <img className="w-52 h-52" src="/mashu.png" alt="Mashu"/>
                 </div>
             </div>
-        </main>
+        </section>
     )
 }
 

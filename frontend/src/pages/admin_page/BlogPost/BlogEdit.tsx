@@ -1,38 +1,35 @@
-import React, {useEffect, useState} from 'react';
-import axios from 'axios';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
-export default function BlogPost() {
-    // State variables for form inputs
+export default function BlogEdit() {
+    const { postId } = useParams<{ postId: string }>();
+    const [blogEdit, setBlogEdit] = useState<BlogEdit | null>(null);
     const [title, setTitle] = useState('');
     const [post, setPost] = useState('');
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [categories, setCategories] = useState<string[]>([]);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchBlogPost = async () => {
             try {
-                const response = await axios.get('/blog/posts'); // Replace 'admin/blog/all' with your actual API endpoint
-                const blogData = response.data.blogData;
-                const allCategories = blogData.reduce((acc: any[], blog: { categories: any[]; }) => {
-                    blog.categories.forEach(category => {
-                        if (!acc.includes(category.category)) {
-                            acc.push(category.category);
-                        }
-                    });
-                    return acc;
-                }, []);
-                setCategories(allCategories);
+                const response = await axios.get<BlogResponse>(`/blog/post/${postId}`);
+                const blogData: BlogEdit = response.data.blogData; // Assuming you only get one blog post
+                setBlogEdit(blogData);
+                setTitle(blogData.title);
+                setPost(blogData.post);
+                setSelectedCategory(blogData.categories[0].category); // Assuming a blog post can have only one category
+                // Fetch categories if needed
             } catch (error) {
-                console.error('Error fetching categories:', error);
+                console.error('Error fetching blog post:', error);
             }
         };
 
-        fetchCategories();
-    }, []);
+        fetchBlogPost();
+    }, [postId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,20 +37,14 @@ export default function BlogPost() {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('post', post);
-            formData.append('image', image!);
+            if (image) formData.append('image', image);
             formData.append('category', selectedCategory);
 
-            const response = await axios.post('admin/blog/create', formData);
-            console.log('Blog posted successfully:', response.data);
-
-            // Reset form inputs after successful submission
-            setTitle('');
-            setPost('');
-            setImage(null);
-            setImagePreview(null);
-            setSelectedCategory('');
+            const response = await axios.put(`/admin/blog/update/${postId}`, formData);
+            console.log('Blog post updated successfully:', response.data);
+            // Redirect to the updated blog post or to the blog post list page
         } catch (error) {
-            console.error('Error posting blog:', error);
+            console.error('Error updating blog post:', error);
         }
     };
 
@@ -71,7 +62,7 @@ export default function BlogPost() {
 
     return (
         <div className="mx-auto mt-8 p-6 bg-white rounded-md shadow-md xl:w-[90rem]">
-            <h1 className="text-2xl font-bold mb-4">Post a Blog</h1>
+            <h1 className="text-2xl font-bold mb-4">Edit Blog Post</h1>
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label htmlFor="title" className="block text-gray-700 font-semibold mb-2">
@@ -80,7 +71,7 @@ export default function BlogPost() {
                     <input
                         type="text"
                         id="title"
-                        value={title}
+                        value={title || (blogEdit && blogEdit.title) || ''}
                         onChange={(e) => setTitle(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                     />
@@ -90,7 +81,7 @@ export default function BlogPost() {
                         Post
                     </label>
                     <ReactQuill
-                        value={post}
+                        value={post || (blogEdit && blogEdit.post) || ''}
                         onChange={setPost}
                         modules={{
                             toolbar: [
@@ -142,20 +133,41 @@ export default function BlogPost() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                     >
                         <option value="">Select...</option>
-                        {categories.map((category, index) => (
-                            <option key={index} value={category}>
-                                {category}
-                            </option>
-                        ))}
+                        {/*{categories.map((category, index) => (*/}
+                        {/*    <option key={index} value={category}>*/}
+                        {/*        {category}*/}
+                        {/*    </option>*/}
+                        {/*))}*/}
                     </select>
                 </div>
                 <button
                     type="submit"
                     className="w- bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
                 >
-                    Post Blog
+                    Update Blog
                 </button>
             </form>
         </div>
     );
+}
+
+type BlogResponse = {
+    blogData: BlogEdit;
+}
+
+type BlogEdit = {
+    id: number;
+    title: string;
+    post: string;
+    image: string;
+    create_at: string;
+    update_at: string;
+    deleted_at: null;
+    categories: Category[];
+};
+
+type Category = {
+    id: number;
+    category: string;
+    blogs: null;
 }

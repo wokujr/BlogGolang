@@ -1,4 +1,4 @@
-export default function JapaPage() {
+export default function JapanPage() {
     return (
         <>
             Japan
